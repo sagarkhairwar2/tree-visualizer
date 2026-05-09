@@ -65,11 +65,11 @@ tree-visualizer/
 ├── templates/
 │   └── index.html
 │
-├── screenshots/
-│   ├── home.png
-│   ├── collapse.png
-│   ├── random_tree.png
-│   └── search.png
+├── TV_Home_page.png
+├── TV_Collapse.png
+├── TV_Random_1.png
+├── TV_Random_2.png
+└── TV_search.png
 ```
 
 ---
@@ -130,13 +130,10 @@ gunicorn app:app
 
 ## Home Page
 
-Add screenshot here:
 
-```md
-![Home Page](screenshots/home.png)
-```
+![Home Page](TV_Home_page.png)
 
-Suggested screenshot:
+
 - Full tree visualization
 - Toolbar visible
 - Zoom buttons visible
@@ -145,13 +142,9 @@ Suggested screenshot:
 
 ## Collapse Functionality
 
-Add screenshot here:
+![Collapse Functionality](TV_Collapse.png)
 
-```md
-![Collapse Functionality](screenshots/collapse.png)
-```
 
-Suggested screenshot:
 - One subtree collapsed
 - "+" collapse icon visible
 
@@ -159,27 +152,22 @@ Suggested screenshot:
 
 ## Random Tree Generation
 
-Add screenshot here:
 
-```md
-![Random Tree](screenshots/random_tree.png)
-```
+![Random Tree 1](TV_Random_1.png)
 
-Suggested screenshot:
+![Random Tree 1](TV_Random_2.png)
+
 - Randomly generated large tree
 
 ---
 
 ## Search and Highlight
 
-Add screenshot here:
 
-```md
-![Search Feature](screenshots/search.png)
-```
+![Search Feature](TV_search.png)
 
-Suggested screenshot:
-- Highlighted searched node
+
+- Highlighted (red) searched node
 
 ---
 
@@ -266,7 +254,7 @@ This project helped in understanding:
 
 # Author
 
-Your Name Here
+Sagar Kumar Khairwar
 
 ---
 
