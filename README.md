@@ -69,7 +69,8 @@ tree-visualizer/
 ├── TV_Collapse.png
 ├── TV_Random_1.png
 ├── TV_Random_2.png
-└── TV_search.png
+├── TV_search.png
+└── TV_search_R.png
 ```
 
 ---
@@ -166,7 +167,7 @@ gunicorn app:app
 
 ![Search Feature](TV_search.png)
 
-
+![Search Feature](TV_search_R.png)
 - Highlighted (red) searched node
 
 ---
