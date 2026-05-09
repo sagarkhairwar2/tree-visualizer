@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Tree Visualizer</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eeeeee;
+            overflow: hidden;
+        }
+
+        .top-panel {
+            padding: 20px;
+            background-color: white;
+            border-bottom: 2px solid #cccccc;
+        }
+
+        .stats {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 8px;
+            width: 250px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .svg-container {
+            width: 100vw;
+            height: calc(100vh - 240px);
+
+            overflow: auto;
+
+            background-color: #f2f2f2;
+
+            scroll-behavior: smooth;
+        }
+
+        svg {
+            width: 5000px;
+            height: 3000px;
+        }
+
+        .node {
+            fill: #4c566a;
+
+            stroke: #2e3440;
+            stroke-width: 2;
+
+            transition:
+                fill 0.2s ease,
+                transform 0.2s ease,
+                opacity 0.2s ease;
+        }
+
+        .clickable:hover {
+            fill: #5e81ac;
+            cursor: pointer;
+            transform: scale(1.05);
+        }
+
+        .highlight {
+            fill: #e63946;
+        }
+
+        .label {
+            fill: white;
+            font-size: 14px;
+
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .edge {
+            stroke: #a3aab5;
+            stroke-width: 2;
+
+            transition: opacity 0.2s ease;
+        }
+
+        .circle {
+            fill: orange;
+        }
+
+        #zoom-container {
+            transform-origin: top left;
+            transition: transform 0.2s ease;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="top-panel">
+
+    <h1>Tree Visualizer</h1>
+
+    <div class="stats">
+
+        <b>Total Nodes:</b> {{ total_nodes }}
+        <br>
+
+        <b>Leaf Nodes:</b> {{ leaf_nodes }}
+        <br>
+
+        <b>Tree Depth:</b> {{ tree_depth_value }}
+        <br>
+
+        <b>Collapsed Nodes:</b> {{ collapsed_count }}
+
+    </div>
+
+    <form method="GET" action="/" style="margin-bottom:20px;">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search node..."
+            value="{{ search_text }}"
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+        <a href="/">
+            <button type="button">
+                Default Tree
+            </button>
+        </a>
+
+        <a href="/random">
+            <button type="button">
+                Random Tree
+            </button>
+        </a>
+
+        <button type="button" onclick="zoomIn()">
+            Zoom In
+        </button>
+
+        <button type="button" onclick="zoomOut()">
+            Zoom Out
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="svg-container" id="svg-container">
+
+<div id="zoom-container">
+
+<svg viewBox="0 0 5000 3000">
+
+
+    {% for edge in edges %}
+
+    <line
+        class="edge"
+
+        x1="{{ edge.source_x + (node_width / 2) }}"
+        y1="{{ edge.source_y + node_height }}"
+
+        x2="{{ edge.target_x + (node_width / 2) }}"
+        y2="{{ edge.target_y }}"
+    />
+
+    {% endfor %}
+
+
+
+    {% for node in nodes %}
+
+
+        {% if node.has_children %}
+        <a href="/toggle/{{ node.id }}">
+        {% endif %}
+
+
+        <rect
+            class="
+                node
+                {% if node.has_children %}clickable{% endif %}
+                {% if node.highlight %}highlight{% endif %}
+            "
+
+            x="{{ node.x }}"
+            y="{{ node.y }}"
+
+            width="{{ node_width }}"
+            height="{{ node_height }}"
+
+            rx="12"
+        />
+
+
+        <text
+            class="label"
+
+            x="{{ node.x + (node_width / 2) }}"
+            y="{{ node.y + (node_height / 2) }}"
+        >
+            {{ node.name }}
+        </text>
+
+
+        <text
+            x="{{ node.x }}"
+            y="{{ node.y - 10 }}"
+
+            font-size="11"
+
+            fill="black"
+        >
+            D:{{ node.depth }}
+            |
+            C:{{ node.children_count }}
+        </text>
+
+
+        {% if node.has_children %}
+
+            <circle
+                class="circle"
+
+                cx="{{ node.x + (node_width / 2) }}"
+                cy="{{ node.y + node_height + 2 }}"
+
+                r="7"
+            />
+
+            <text
+                x="{{ node.x + (node_width / 2) }}"
+                y="{{ node.y + node_height + 2 }}"
+
+                text-anchor="middle"
+
+                dominant-baseline="middle"
+
+                font-size="12"
+
+                fill="white"
+            >
+                {% if node.collapsed %}
+                    +
+                {% else %}
+                    -
+                {% endif %}
+            </text>
+
+        {% endif %}
+
+
+        {% if node.has_children %}
+        </a>
+        {% endif %}
+
+
+    {% endfor %}
+
+</svg>
+
+</div>
+
+</div>
+
+
+<script>
+
+    let zoomLevel = 1;
+
+    const container =
+        document.getElementById("svg-container");
+
+
+    function zoomIn() {
+
+        zoomLevel += 0.1;
+
+        document.getElementById(
+            "zoom-container"
+        ).style.transform =
+            `scale(${zoomLevel})`;
+
+        saveZoom();
+    }
+
+
+    function zoomOut() {
+
+        zoomLevel -= 0.1;
+
+        if (zoomLevel < 0.2) {
+            zoomLevel = 0.2;
+        }
+
+        document.getElementById(
+            "zoom-container"
+        ).style.transform =
+            `scale(${zoomLevel})`;
+
+        saveZoom();
+    }
+
+
+    function saveZoom() {
+
+        localStorage.setItem(
+            "zoomLevel",
+            zoomLevel
+        );
+    }
+
+
+    window.onload = function() {
+
+        const savedZoom =
+            localStorage.getItem("zoomLevel");
+
+        if (savedZoom) {
+
+            zoomLevel = parseFloat(savedZoom);
+
+            document.getElementById(
+                "zoom-container"
+            ).style.transform =
+                `scale(${zoomLevel})`;
+        }
+
+
+        const scrollX =
+            localStorage.getItem("scrollX");
+
+        const scrollY =
+            localStorage.getItem("scrollY");
+
+        if (scrollX && scrollY) {
+
+            container.scrollLeft = scrollX;
+
+            container.scrollTop = scrollY;
+        }
+    };
+
+
+    container.addEventListener(
+        "scroll",
+        function() {
+
+            localStorage.setItem(
+                "scrollX",
+                container.scrollLeft
+            );
+
+            localStorage.setItem(
+                "scrollY",
+                container.scrollTop
+            );
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
